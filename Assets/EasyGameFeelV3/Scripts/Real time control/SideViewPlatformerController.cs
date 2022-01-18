@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 public class SideViewPlatformerController : MonoBehaviour
 {
     //Este codigo esta vazado en los videos https://www.youtube.com/watch?v=w4YV8s9Wi3w&list=PLLTae1_1NyOOqKBz2WXeqrWRhvD0ttv5L&index=16&t=284s
@@ -219,9 +220,11 @@ public class SideViewPlatformerController : MonoBehaviour
     private LayerMask floor;
 
     ///<summary>
-    ///Sirve como referencia que indica hacia donde el jugador desea moverse horizontalmente. 
+    ///Determina hasia donde se movera el jugador
     ///</summary>
-    private float moveInput;
+    [SerializeField]
+    private Vector2 moveInput;
+
     ///<summary>
     ///Referencia al valor original de startDashTime
     ///</summary>
@@ -252,68 +255,71 @@ public class SideViewPlatformerController : MonoBehaviour
         startJumps = extreJumps;
         rb = gameObject.GetComponent<Rigidbody2D>();
     }
+
     ///<summary>
-    ///Mueve al avatar del jugador dependiendo de que tipo de movimiento se escogio.
+    ///Mueve al jugador
     ///</summary>
-    private void FixedUpdate()
+    public void Move(InputAction.CallbackContext context)
     {
-        moveInput = Input.GetAxisRaw("Horizontal");
-        if (startingDashTime == dashTime || !activateDash)
+        if (context.performed)
         {
-            if (usesForceMovement)
+            Debug.Log("Move");
+            moveInput = context.ReadValue<Vector2>();
+
+            rb.velocity = moveInput * speed;
+        }
+    }
+
+    public void Jump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            touchingFloor = Physics2D.OverlapCircle(feetPos.position, checkRadius, floor);
+            if (startJumps > 0 || touchingFloor)
             {
-                rb.AddForce(new Vector2(moveInput * speed, 0), ForceMode2D.Impulse);
+                rb.velocity += Vector2.up * jumpHight;
             }
-            else
+            if (touchingFloor)
             {
-                rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
+                startJumps = extreJumps;
             }
         }
     }
+
     ///<summary>
     ///Hace que el jugador salte, determian la direccion del dash y aplica el dash al avatar del jugador.
     ///</summary>
     private void Update()
     {
-        touchingFloor = Physics2D.OverlapCircle(feetPos.position, checkRadius, floor);
-        if (Input.GetButtonDown(jumpButton) && (startJumps > 0 || touchingFloor))
-        {
-            rb.velocity += Vector2.up * jumpHight;
-            startJumps -= 1;
-        }
-        if (touchingFloor)
-        {
-            startJumps = extreJumps;
-        }
-        if (activateDash)
-        {
-            if (!dashIsActive && Input.GetButtonDown(dashButton) && rb.velocity != Vector2.zero)
-            {
-                if (rb.velocity.x < 0)
-                {
-                    dashDirection += Vector2.left;
-                }
-                if (rb.velocity.x > 0)
-                {
-                    dashDirection += Vector2.right;
-                }
-                dashIsActive = true;
-            }
-            else
-            {
-                if (startingDashTime < 0)
-                {
-                    dashIsActive = false;
-                    startingDashTime = dashTime;
-                    dashDirection = Vector2.zero;
-                    rb.velocity = Vector2.zero;
-                }
-                else if (dashIsActive)
-                {
-                    startingDashTime -= Time.deltaTime;
-                    rb.velocity = dashDirection * dashSpeed;
-                }
-            }
-        }
+        //if (activateDash)
+        //{
+        //    if (!dashIsActive && Input.GetButtonDown(dashButton) && rb.velocity != Vector2.zero)
+        //    {
+        //        if (rb.velocity.x < 0)
+        //        {
+        //            dashDirection += Vector2.left;
+        //        }
+        //        if (rb.velocity.x > 0)
+        //        {
+        //            dashDirection += Vector2.right;
+        //        }
+        //        dashIsActive = true;
+        //    }
+        //    else
+        //    {
+        //        if (startingDashTime < 0)
+        //        {
+        //            dashIsActive = false;
+        //            startingDashTime = dashTime;
+        //            dashDirection = Vector2.zero;
+        //            rb.velocity = Vector2.zero;
+        //        }
+        //        else if (dashIsActive)
+        //        {
+        //            startingDashTime -= Time.deltaTime;
+        //            rb.velocity = dashDirection * dashSpeed;
+        //        }
+        //    }
+        //}
     }
 }
