@@ -257,17 +257,11 @@ public class SideViewPlatformerController : MonoBehaviour
     }
 
     ///<summary>
-    ///Mueve al jugador
+    ///Indica hascia donde se desplazara el jugador
     ///</summary>
     public void Move(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            Debug.Log("Move");
-            moveInput = context.ReadValue<Vector2>();
-
-            rb.velocity = moveInput * speed;
-        }
+    {    
+        moveInput = context.ReadValue<Vector2>();
     }
 
     public void Jump(InputAction.CallbackContext context)
@@ -287,10 +281,19 @@ public class SideViewPlatformerController : MonoBehaviour
     }
 
     ///<summary>
+    ///Desplaza al jugador de izquierda a derecha
+    ///</summary>
+    private void FixedUpdate()
+    {
+        rb.velocity = new Vector2(moveInput.x * speed, rb.velocity.y);
+    }
+
+    ///<summary>
     ///Hace que el jugador salte, determian la direccion del dash y aplica el dash al avatar del jugador.
     ///</summary>
     private void Update()
     {
+
         //if (activateDash)
         //{
         //    if (!dashIsActive && Input.GetButtonDown(dashButton) && rb.velocity != Vector2.zero)
