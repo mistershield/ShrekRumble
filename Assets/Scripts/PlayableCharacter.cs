@@ -2,10 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class SideViewPlatformerController : MonoBehaviour
+
+public abstract class PlayableCharacter : MonoBehaviour, IDamageable, IDamager
 {
     //Este codigo esta basado en los videos https://www.youtube.com/watch?v=w4YV8s9Wi3w&list=PLLTae1_1NyOOqKBz2WXeqrWRhvD0ttv5L&index=16&t=284s
     //y https://www.youtube.com/watch?v=j111eKN8sJw&t=2s.
+
+    public float LightDmg
+    {
+        get
+        {
+            return lightDmg;
+        }
+        set
+        {
+            lightDmg = value;
+        }
+    }
+    public float HeavyDmg { get; set; }
+    public float AirLightDmg { get; set; }
+    public float AirHeavyDmg { get; set; }
+    public float UltimageDmg { get; set; }
+    public float DistanceAttackDmg { get; set; }
+
     public float Speed
     {
         get
@@ -17,12 +36,6 @@ public class SideViewPlatformerController : MonoBehaviour
             speed = value;
         }
     }
-    public float LightDmg { get; set; }
-    public float HeavyDmg { get; set; }
-    public float AirLightDmg { get; set; }
-    public float AirHeavyDmg { get; set; }
-    public float UltimageDmg { get; set; }
-    public float DistanceAttackDmg { get; set; }
     public float DashSpeed
     {
         get
@@ -157,7 +170,11 @@ public class SideViewPlatformerController : MonoBehaviour
         }
     }
 
+    public float Health => throw new System.NotImplementedException();
 
+
+    [SerializeField]
+    private float lightDmg = 0;
     ///<summary>
     ///Determina qué tan rápido se moverá el objeto.
     ///</summary>
@@ -254,21 +271,53 @@ public class SideViewPlatformerController : MonoBehaviour
     ///</summary>
     private Vector2 dashDirection = Vector2.zero;
 
+    protected Animator animator;
+
     ///<summary>
     ///Inicializa variables.
     ///</summary>
-    private void Start()
+    protected virtual void Start()
     {
         startingDashTime = dashTime;
         startJumps = extreJumps;
         rb = gameObject.GetComponent<Rigidbody2D>();
+        animator = gameObject.GetComponent<Animator>();
+    }
+    
+    ///<summary>
+    ///
+    ///</summary>
+    public virtual void DoLightAttack(InputAction.CallbackContext context)
+    {
+        animator.Play("lightAttack");
+    }
+    ///<summary>
+    ///
+    ///</summary>
+    public virtual void DoHeavyAttack(InputAction.CallbackContext context)
+    {
+        animator.Play("heavyAttack");
+    }
+    ///<summary>
+    ///
+    ///</summary>
+    public virtual void DoUltimateAttack(InputAction.CallbackContext context)
+    {
+        animator.Play("ultimateAbility");
+    }
+    ///<summary>
+    ///
+    ///</summary>
+    public virtual void DoDistanceAttack(InputAction.CallbackContext context)
+    {
+        animator.Play("specialAbility");
     }
 
     ///<summary>
     ///Indica hascia donde se desplazara el jugador
     ///</summary>
-    public void Move(InputAction.CallbackContext context)
-    {    
+    public virtual void Move(InputAction.CallbackContext context)
+    {
         moveInput = context.ReadValue<Vector2>();
     }
 
@@ -335,5 +384,25 @@ public class SideViewPlatformerController : MonoBehaviour
         //        }
         //    }
         //}
+    }
+
+    public void SetHealth(float hp)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void TakeDamage(float dmg)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void HealDamage(float dmg)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void DoDamage(IDamageable damageable)
+    {
+        throw new System.NotImplementedException();
     }
 }
