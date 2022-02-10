@@ -22,6 +22,14 @@
                     "interactions": ""
                 },
                 {
+                    "name": "Dash",
+                    "type": "Button",
+                    "id": "c3307962-6e0c-462f-b33a-6728f254bf66",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
                     "name": "LightAttack",
                     "type": "Button",
                     "id": "d5143079-70e5-4492-b926-23fe111a87d5",
@@ -140,6 +148,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "UltimateAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6cf91bec-fd89-4654-b4ae-ed74b507b95c",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dash",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

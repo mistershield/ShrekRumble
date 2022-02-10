@@ -19,11 +19,127 @@ public abstract class PlayableCharacter : MonoBehaviour, IDamageable, IDamager
             lightDmg = value;
         }
     }
-    public float HeavyDmg { get; set; }
-    public float AirLightDmg { get; set; }
-    public float AirHeavyDmg { get; set; }
-    public float UltimageDmg { get; set; }
-    public float DistanceAttackDmg { get; set; }
+    public GameObject LightAttackObject
+    {
+        get
+        {
+            return lightAttackObject;
+        }
+        set
+        {
+            lightAttackObject = value;
+        }
+    }
+    public float HeavyDmg
+    {
+        get
+        {
+            return heavyDmg;
+        }
+        set
+        {
+            heavyDmg = value;
+        }
+    }
+    public GameObject HeavyAttackbject
+    {
+        get
+        {
+            return heavyAttackbject;
+        }
+        set
+        {
+            heavyAttackbject = value;
+        }
+    }
+    public float AirLightDmg
+    {
+        get
+        {
+            return airLightDmg;
+        }
+        set
+        {
+            airLightDmg = value;
+        }
+    }
+    public GameObject AirLightAttackObject
+    {
+        get
+        {
+            return airLightAttackObject;
+        }
+        set
+        {
+            airLightAttackObject = value;
+        }
+    }
+    public float AirHeavyDmg
+    {
+        get
+        {
+            return airHeavyDmg;
+        }
+        set
+        {
+            airHeavyDmg = value;
+        }
+    }
+    public GameObject AirHeavyAttackObject
+    {
+        get
+        {
+            return airHeavyAttackObject;
+        }
+        set
+        {
+            airHeavyAttackObject = value;
+        }
+    }
+    public float UltimateDmg
+    {
+        get
+        {
+            return ultimateDmg;
+        }
+        set
+        {
+            ultimateDmg = value;
+        }
+    }
+    public GameObject UltimateAttackObject
+    {
+        get
+        {
+            return ultimateAttackObject;
+        }
+        set
+        {
+            ultimateAttackObject = value;
+        }
+    }
+    public float DistanceAttackDmg
+    {
+        get
+        {
+            return distanceAttackDmg;
+        }
+        set
+        {
+            distanceAttackDmg = value;
+        }
+    }
+    public GameObject DistanceAttackObject
+    {
+        get
+        {
+            return distanceAttackObject;
+        }
+        set
+        {
+            distanceAttackObject = value;
+        }
+    }
 
     public float Speed
     {
@@ -172,9 +288,30 @@ public abstract class PlayableCharacter : MonoBehaviour, IDamageable, IDamager
 
     public float Health => throw new System.NotImplementedException();
 
-
     [SerializeField]
     private float lightDmg = 0;
+    [SerializeField]
+    private GameObject lightAttackObject;
+    [SerializeField]
+    private float heavyDmg = 0;
+    [SerializeField]
+    private GameObject heavyAttackbject;
+    [SerializeField]
+    private float airLightDmg = 0;
+    [SerializeField]
+    private GameObject airLightAttackObject;
+    [SerializeField]
+    private float airHeavyDmg = 0;
+    [SerializeField]
+    private GameObject airHeavyAttackObject;
+    [SerializeField]
+    private float ultimateDmg = 0;
+    [SerializeField]
+    private GameObject ultimateAttackObject;
+    [SerializeField]
+    private float distanceAttackDmg = 0;
+    [SerializeField]
+    private GameObject distanceAttackObject;
     ///<summary>
     ///Determina qué tan rápido se moverá el objeto.
     ///</summary>
@@ -290,6 +427,7 @@ public abstract class PlayableCharacter : MonoBehaviour, IDamageable, IDamager
     public virtual void DoLightAttack(InputAction.CallbackContext context)
     {
         animator.Play("lightAttack");
+        StartCoroutine(DoAttack(animator.GetCurrentAnimatorStateInfo(0).length, lightAttackObject));
     }
     ///<summary>
     ///
@@ -297,6 +435,7 @@ public abstract class PlayableCharacter : MonoBehaviour, IDamageable, IDamager
     public virtual void DoHeavyAttack(InputAction.CallbackContext context)
     {
         animator.Play("heavyAttack");
+        StartCoroutine(DoAttack(animator.GetCurrentAnimatorStateInfo(0).length, heavyAttackbject));
     }
     ///<summary>
     ///
@@ -304,6 +443,7 @@ public abstract class PlayableCharacter : MonoBehaviour, IDamageable, IDamager
     public virtual void DoUltimateAttack(InputAction.CallbackContext context)
     {
         animator.Play("ultimateAbility");
+        StartCoroutine(DoAttack(animator.GetCurrentAnimatorStateInfo(0).length, ultimateAttackObject));
     }
     ///<summary>
     ///
@@ -340,50 +480,56 @@ public abstract class PlayableCharacter : MonoBehaviour, IDamageable, IDamager
         }
     }
 
+    public virtual void Dash(InputAction.CallbackContext context)
+    {
+        if (activateDash)
+        {
+            if (!dashIsActive && rb.velocity != Vector2.zero)
+            {
+                if (rb.velocity.x < 0)
+                {
+                    dashDirection += Vector2.left;
+                }
+                if (rb.velocity.x > 0)
+                {
+                    dashDirection += Vector2.right;
+                }
+                dashIsActive = true;
+            }
+        }
+    }
+
     ///<summary>
     ///Desplaza al jugador de izquierda a derecha
     ///</summary>
     private void FixedUpdate()
     {
-        rb.velocity = new Vector2(moveInput.x * speed, rb.velocity.y);
+        if (!dashIsActive)
+        {
+            rb.velocity = new Vector2(moveInput.x * speed, rb.velocity.y);
+        }
     }
 
     ///<summary>
-    ///Hace que el jugador salte, determian la direccion del dash y aplica el dash al avatar del jugador.
+    ///Aplica el dash al avatar del jugador.
     ///</summary>
     private void Update()
     {
-
-        //if (activateDash)
-        //{
-        //    if (!dashIsActive && Input.GetButtonDown(dashButton) && rb.velocity != Vector2.zero)
-        //    {
-        //        if (rb.velocity.x < 0)
-        //        {
-        //            dashDirection += Vector2.left;
-        //        }
-        //        if (rb.velocity.x > 0)
-        //        {
-        //            dashDirection += Vector2.right;
-        //        }
-        //        dashIsActive = true;
-        //    }
-        //    else
-        //    {
-        //        if (startingDashTime < 0)
-        //        {
-        //            dashIsActive = false;
-        //            startingDashTime = dashTime;
-        //            dashDirection = Vector2.zero;
-        //            rb.velocity = Vector2.zero;
-        //        }
-        //        else if (dashIsActive)
-        //        {
-        //            startingDashTime -= Time.deltaTime;
-        //            rb.velocity = dashDirection * dashSpeed;
-        //        }
-        //    }
-        //}
+        if(dashIsActive)
+        {
+            if (startingDashTime < 0)
+            {
+                dashIsActive = false;
+                startingDashTime = dashTime;
+                dashDirection = Vector2.zero;
+                rb.velocity = Vector2.zero;
+            }
+            else if (dashIsActive)
+            {
+                startingDashTime -= Time.deltaTime;
+                rb.velocity = dashDirection * dashSpeed;
+            }
+        }
     }
 
     public void SetHealth(float hp)
@@ -404,5 +550,12 @@ public abstract class PlayableCharacter : MonoBehaviour, IDamageable, IDamager
     public void DoDamage(IDamageable damageable)
     {
         throw new System.NotImplementedException();
+    }
+
+    private IEnumerator DoAttack(float time, GameObject attackHitBox)
+    {
+        attackHitBox.SetActive(true);
+        yield return new WaitForSeconds(time);
+        attackHitBox.SetActive(false);
     }
 }
